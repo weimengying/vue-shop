@@ -1,0 +1,319 @@
+<template>
+  <div>
+    <!-- 面包屑导航区域 -->
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>商品管理</el-breadcrumb-item>
+      <el-breadcrumb-item>参数列表</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 卡片区域 -->
+    <el-card>
+      <!-- 警告区域 -->
+      <el-alert title="注意：只允许为第三级分类设置相关参数！" show-icon type="warning" :closable="false"></el-alert>
+      <!-- 选择商品分类区域 -->
+      <el-row class="cat_opt">
+        <el-col>
+          <span>选择商品分类:</span>
+          <el-cascader
+            expand-trigger="hover"
+            v-model="selectedCateKeys"
+            :options="catelist"
+            :props="cateProps"
+            @change="handleChange"
+            clearable
+          ></el-cascader>
+        </el-col>
+      </el-row>
+
+      <!-- tab页签 -->
+      <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tab-pane label="动态参数" name="many">
+          <!-- 添加参数按钮 -->
+          <el-button
+            type="primary"
+            size="mini"
+            :disabled="isBtnDisabled"
+            @click="addDialogVisible=true"
+          >添加参数</el-button>
+          <!-- 动态表格 -->
+          <el-table stripe border :data="manyTableData">
+            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="index"></el-table-column>
+            <el-table-column prop="attr_name" label="参数名称"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  type="primary"
+                  icon="el-icon-edit"
+                  @click="showEditDialog(scope.row.attr_id)"
+                >修改</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  icon="el-icon-delete"
+                  @click="removeParams(scope.row.attr_id)"
+                >删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="静态属性" name="only">
+          <!-- 添加属性按钮 -->
+          <el-button
+            type="primary"
+            size="mini"
+            :disabled="isBtnDisabled"
+            @click="addDialogVisible=true"
+          >添加属性</el-button>
+          <!-- 静态属性表格 -->
+          <el-table stripe border :data="onlyTableData">
+            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="index"></el-table-column>
+            <el-table-column prop="attr_name" label="属性名称"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  type="primary"
+                  icon="el-icon-edit"
+                  @click="showEditDialog(scope.row.attr_id)"
+                >修改</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  icon="el-icon-delete"
+                  @click="removeParams(scope.row.attr_id)"
+                >删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+      </el-tabs>
+
+      <!-- 添加参数对话框 -->
+      <el-dialog
+        :title="'添加' +titleText"
+        :visible.sync="addDialogVisible"
+        width="50%"
+        @close="addDialogClosed"
+      >
+        <!-- 添加参数的对话框 -->
+        <el-form
+          :model="addForm"
+          :rules="addFormRules"
+          ref="addFormRef"
+          label-width="100px"
+          @close="addDialogClosed"
+        >
+          <el-form-item :label="titleText" prop="attr_name">
+            <el-input v-model="addForm.attr_name"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="addDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addParams">确 定</el-button>
+        </span>
+      </el-dialog>
+
+      <!-- 编辑对话框 -->
+      <el-dialog
+        :title="'编辑' +titleText"
+        :visible.sync="editDialogVisible"
+        width="50%"
+        @close="editDialogClosed"
+      >
+        <!-- 添加参数的对话框 -->
+        <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="100px">
+          <el-form-item :label="titleText" prop="attr_name">
+            <el-input v-model="editForm.attr_name"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="editParams">确 定</el-button>
+        </span>
+      </el-dialog>
+    </el-card>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      catelist: [],
+      cateProps: {
+        value: 'cat_id',
+        label: 'cat_name',
+        children: 'children'
+      },
+      //选中的父级分类的Id数组
+      selectedCateKeys: [],
+      //被激活的页签的名称
+      activeName: 'many',
+      //动态参数的数据
+      manyTableData: [],
+      //静态属性的数据
+      onlyTableData: [],
+      addDialogVisible: false,
+      // 添加参数的表单数据对象
+      addForm: {
+        attr_name: ''
+      },
+      addFormRules: {
+        attr_name: [
+          { required: true, message: '请输入参数名称', trigger: 'blur' }
+        ]
+      },
+      editDialogVisible: false,
+      // 编辑参数的表单数据对象
+      editForm: {},
+      editFormRules: {
+        attr_name: [
+          { required: true, message: '请输入参数名称', trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  computed: {
+    //如果按钮需要被禁用,则返回true.否则false
+    isBtnDisabled() {
+      if (this.selectedCateKeys.length !== 3) {
+        return true
+      } else {
+        return false
+      }
+    },
+    //获取当前选中的三级分类id
+    cateId() {
+      if (this.selectedCateKeys.length === 3) {
+        return this.selectedCateKeys[2]
+      }
+      return null
+    },
+    //动态标题
+    titleText() {
+      if (this.activeName === 'many') {
+        return '动态参数'
+      }
+      return '静态属性'
+    }
+  },
+  created() {
+    this.getCateList()
+  },
+  methods: {
+    // 获取商品分类数据
+    async getCateList() {
+      const { data: res } = await this.$http.get('categories')
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取商品分类失败！')
+      }
+      // 把数据列表，赋值给 catelist
+      this.catelist = res.data
+    },
+    //级联选择框选中项变化，会触发这个函数
+    handleChange() {
+      this.getParamsData()
+    },
+    // tab 页签点击事件的处理函数
+    handleClick(tab, event) {
+      this.getParamsData()
+    },
+    //获取参数的列表数据
+    async getParamsData() {
+      //证明选中的不是三级分类
+      if (this.selectedCateKeys.length !== 3) {
+        this.selectedCateKeys = []
+        return
+      }
+      //证明选中的是三级分类
+      console.log(this.selectedCateKeys)
+      //根据所选的分类Id，和当前所处的面板，获取对应的参数
+      const { data: res } = await this.$http.get(
+        `categories/${this.cateId}/attributes`,
+        {
+          params: { sel: this.activeName }
+        }
+      )
+
+      if (res.meta.status !== 200) {
+        this.$message.error('获取数据失败')
+      }
+      if (this.activeName === 'many') {
+        this.manyTableData = res.data
+      } else {
+        this.onlyTableData = res.data
+      }
+    },
+    // 监听添加对话框的关闭事件
+    addDialogClosed() {
+      this.$refs.addFormRef.resetFields()
+    },
+    // 监听编辑对话框的关闭事件
+    editDialogClosed() {
+      this.$refs.editFormRef.resetFields()
+    },
+    //添加参数
+    addParams() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await this.$http.put(
+          `categories/${this.cateId}/attributes`,
+          {
+            attr: this.addForm.attr_name,
+            attr_sel: this.activeName
+          }
+        )
+        if (res.meta.status !== 201) {
+          return this.$message.error('添加参数失败！')
+        }
+
+        this.$message.success('添加参数成功！')
+        this.addDialogVisible = false
+        this.getParamsData()
+      })
+    },
+    //点击按钮，展示修改对话框
+    async showEditDialog(attr_id) {
+      const { data: res } = await this.$http.get(
+        `categories/${this.cateId}/attributes/${attr_id}`,
+        {
+          params: { attr_sel: this.activeName }
+        }
+      )
+      if (res.meta.status !== 200) {
+        this.$message.error('获取参数信息失败')
+      }
+      this.editForm = res.data
+      this.editDialogVisible = true
+    },
+    //点击修改，提交数据
+    editParams() {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) return
+        const {
+          data: res
+        } = await this.$http.put(
+          `categories/${this.cateId}/attributes/${this.editForm.attr_id}`,
+          { attr_name: this.editForm.attr_name, attr_sel: this.activeName }
+        )
+
+        if (res.meta.status !== 200) {
+          return this.$message.error('修改参数失败！')
+        }
+
+        this.$message.success('修改参数成功！')
+        this.getParamsData()
+        this.editDialogVisible = false
+      })
+    }
+  }
+}
+</script>
+<style lang="less" scoped>
+.cat_opt {
+  padding: 15px 0;
+}
+</style>
