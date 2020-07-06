@@ -36,10 +36,10 @@ import {
     Steps,
     CheckboxGroup,
     Checkbox,
-    Upload,
-    Timeline,
-    TimelineItem
+    Upload
 } from 'element-ui'
+import Timeline from './timeline/index.js'
+import TimelineItem from './timeline-item/index.js'
 
 Vue.use(Button)
 Vue.use(Form)

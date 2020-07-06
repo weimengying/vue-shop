@@ -75,6 +75,7 @@
 
     <!-- 展示物流进度对话框 -->
     <el-dialog title="查看物流地址" :visible.sync="progressVisible" width="50%">
+      <!-- 时间线 -->
       <el-timeline>
         <el-timeline-item
           placement="top"
@@ -160,4 +161,10 @@ export default {
   }
 }
 </script>
-<style lang="less"></style>
+<style lang="less">
+@import '../../plugins/timeline/timeline.css';
+@import '../../plugins/timeline-item/timeline-item.css';
+.el-cascader {
+  width: 100%;
+}
+</style>
