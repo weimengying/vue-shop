@@ -142,7 +142,7 @@ export default {
       // 商品分类的数据列表，默认为空
       catelist: [],
       //总数据条数
-      total: '',
+      total: 0,
       //表格各列的配置
       columns: [
         {
