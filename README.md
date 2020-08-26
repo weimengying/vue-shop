@@ -1,6 +1,7 @@
 # vue_shop 
 Vue-cli3搭建Vue后台管理
-前端技术栈采用Vue+VueRouter+Element-UI+Axios+Echarts，后端技术栈采用Node.js+Express+Jwt(模拟session)+Mysql+Sequelize组成
+前端技术栈采用Vue+VueRouter+Element-UI+Axios+Echarts
+后端技术栈采用Node.js+Express+Jwt(模拟session)+Mysql+Sequelize组成
 ## Project setup
 ```
 npm install
@@ -92,7 +93,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 - [x] 数据统计模块
 
 ## 项目截图
-###登录
+### 登录
 ![index.png](./screenshots/index.png)
 ### 用户管理-用户列表
 ![user.png](./screenshots/user.png)
