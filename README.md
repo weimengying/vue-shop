@@ -1,5 +1,6 @@
 # vue_shop 
 Vue-cli3搭建Vue后台管理
+前端技术栈采用Vue+VueRouter+Element-UI+Axios+Echarts，后端技术栈采用Node.js+Express+Jwt(模拟session)+Mysql+Sequelize组成
 ## Project setup
 ```
 npm install
@@ -27,6 +28,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 - [x] `vue-router`
 - [x] `axios`
 - [x] `ElementUI`
+- [x] `Echarts`
 
 ## vue-router技术要点
 ```
@@ -79,3 +81,18 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 	this.$router.replace(path): 用新路由替换当前路由(不可以返回到当前路由界面)
 	this.$router.back(): 请求(返回)上一个记录路由
  ```
+## 功能
+- [x] 登录/退出功能
+- [x] 用户管理模块
+- [x] 权限管理模块
+- [x] 分类管理模块
+- [x] 参数管理模块
+- [x] 商品管理模块
+- [x] 订单管理模块
+- [x] 数据统计模块
+
+## 项目截图
+###登录
+![index.png](./screenshots/index.png)
+### 用户管理
+![newsDetail.gif](./screenshots/newsDetail.gif)
