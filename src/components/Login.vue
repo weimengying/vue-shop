@@ -3,7 +3,7 @@
     <div class="login_box">
       <!-- 头像区域 -->
       <div class="avatar_box">
-        <img src="../assets/logo.png" alt />
+        <!-- <img src="../assets/logo.png" alt /> -->
       </div>
       <!-- 登录表单区域 -->
       <el-form
@@ -64,6 +64,7 @@ export default {
       this.$refs.loginFormRef.resetFields();
     },
     login() {
+      debugger
       this.$refs.loginFormRef.validate(async valid => {
         if (!valid) return;
         const { data: res } = await this.$http.post("login", this.loginForm);

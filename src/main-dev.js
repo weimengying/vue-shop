@@ -22,8 +22,8 @@ import 'nprogress/nprogress.css'
 
 
 //配置请求的根路径
-axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
-//axios.defaults.baseURL = 'https://www.liulongbin.top:8888/api/private/v1/
+axios.defaults.baseURL = 'http://www.ysqorz.top:8888/api/private/v1/'
+// axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
 
 //在request拦截器中展示进度条 NProgress.start()
 //设置请求头，在之后的接口请求过程中，都要通过token的认证来获取数据
